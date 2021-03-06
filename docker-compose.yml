@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  cash_server:
+    build: cash_server/
+#    image: "fastapi"
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/code
+    environment:
+      app_host: '0.0.0.0'
+      app_port: 5000
+    depends_on:
+      - db
+  db:
+    container_name: db_container
+    image: "postgres:13"
+    ports:
+      - "5444:5432"
+#    volumes:
+#      - C:\PythonProjects\fastapi_server\data:/var/lib/postgresql/data
+    env_file:
+      - database.env
+#    environment:
+#      POSTGRES_DB: my_cash
+#      POSTGRES_PASSWORD: DQnqGP6y
+#      TZ: Asia/Yekaterinburg
+#      PGTZ: Asia/Yekaterinburg

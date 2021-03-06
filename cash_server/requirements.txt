@@ -1,0 +1,10 @@
+fastapi[all]~=0.63.0
+uvicorn~=0.13.4
+psycopg2~=2.8.6
+Requests
+python-dotenv~=0.15.0
+pydantic~=1.7.3
+typing
+sqlalchemy
+sqlalchemy_utils
+pytz
