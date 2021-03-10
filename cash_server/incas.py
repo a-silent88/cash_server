@@ -3,7 +3,8 @@ from psycopg2 import sql
 # from config import db_con
 from fastapi import APIRouter
 from config import DB_HOST, DB_PORT, DB_USER, DB_NAME, DB_PASSWORD
-import json
+import datetime
+import pytz
 from pydantic import BaseModel
 from typing import Optional
 from fastapi.responses import HTMLResponse
@@ -43,25 +44,27 @@ async def get_after_incas():
     return result
 
 
-class Item_add(BaseModel):
-    terminals: list
-    user: Optional[str] = None
+class ItemAdd(BaseModel):
+    terminals: str
+    user_id: Optional[str] = None
 
 
 # запись в базу времени инкассации. Передаётся список с номерами терминалов и пользователь. Для каждого
 # терминала создаётся отдельная запись
 # async def incas_f(terminal: list, user: str):
 @incas.post("/add/")
-async def incas_f(item: Item_add):
-    con = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST, port=DB_PORT)
+async def incas_f(item: ItemAdd):
+    l_time = datetime.datetime.now()
+    print(l_time)
+    # con = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST, port=DB_PORT)
     cursor = con.cursor()
-    for term in item.terminals:
-        print(term)
-        query = sql.SQL("INSERT INTO cash.schema_name.incas (terminal, \"user\") VALUES (%s, %s)")
-        cursor.execute(query, [term, item.user])
+    term_list = item.terminals.split(sep=',')
+    for term in term_list:
+        query = sql.SQL("INSERT INTO public.incas (terminal, user_id, time) VALUES (%s, %s, %s)")
+        cursor.execute(query, [term.strip(), item.user_id, l_time])
     con.commit()
     cursor.close()
-    con.close()
+    # con.close()
     return HTMLResponse("True", status_code=200)
 
 
@@ -72,7 +75,14 @@ class Item(BaseModel):
     tax: Optional[float] = None
 
 
-@incas.post("/")
-async def after_incas(item: Item):
-    print(item.name)
-    return item
+@incas.post("/add_alchemy/")
+async def add_alchemy(item: ItemAdd):
+    term_list = item.terminals.split(sep=',')
+    for term in term_list:
+        add_incas = Incas(terminal=term.strip(), user_id=item.user_id)
+        session.add(add_incas)
+        session.commit()
+    return HTMLResponse(status_code=200)
+
+
+
