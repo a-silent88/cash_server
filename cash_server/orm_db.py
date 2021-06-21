@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import datetime
 from sqlalchemy_utils import database_exists, create_database, drop_database
-from config import db_str, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME
+from cash_server.config import db_str, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME
 import pytz
 import psycopg2
 from sqlalchemy.sql import func
@@ -11,9 +11,9 @@ from sqlalchemy.sql import func
 
 engine = create_engine(db_str)
 # если хотим очистить данные в таблицах при перезапуске
-if database_exists(engine.url):     # только от суперпользователя
-    drop_database(engine.url)
-    create_database(engine.url)
+# if database_exists(engine.url):     # только от суперпользователя
+#     drop_database(engine.url)
+#     create_database(engine.url)
 
 # создаём базу данных если она не существует
 if not database_exists(engine.url):     # только от суперпользователя базы данных

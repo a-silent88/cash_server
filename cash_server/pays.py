@@ -1,7 +1,8 @@
 # from psycopg2 import sql
 from fastapi import APIRouter
 from orm_db import session, Cash, engine
-
+import requests
+from  requests import Response
 pay = APIRouter()
 
 
@@ -11,6 +12,9 @@ async def add_pay(amount_t: int = 0, terminal: str = '', coin: bool = False):
         add_terminal = Cash(amount=amount_t, terminal=terminal, coin=coin)
         session.add(add_terminal)
         session.commit()
+        return True
+    else:
+        return False
 
 
 # @pay.get("/")

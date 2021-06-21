@@ -3,11 +3,14 @@ import uvicorn
 from config import APP_PORT, APP_HOST
 from pays import pay
 from incas import incas
+from statistic import statistic
+
 
 app = FastAPI()
 
 app.include_router(pay, prefix="/add_pay")
 app.include_router(incas, prefix="/incas")
+app.include_router(statistic, prefix="/statistic")
 
 
 if __name__ == "__main__":
