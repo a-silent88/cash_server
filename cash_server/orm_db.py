@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import datetime
 from sqlalchemy_utils import database_exists, create_database, drop_database
-from cash_server.config import db_str, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME
+from config import db_str, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME
 import pytz
 import psycopg2
 from sqlalchemy.sql import func

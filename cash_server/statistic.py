@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from orm_db import session, Cash, engine, Incas
 from datetime import datetime, timedelta
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 
 statistic = APIRouter()
 
@@ -11,29 +11,29 @@ today = datetime(currently.year, currently.month, currently.day, 0, 0, 0)
 
 @statistic.get("/today/")
 async def get_data():
-    answer = session.query(Cash.amount).filter(Cash.time > today).all()[0]
-    result = 0
-    for i in answer:
-        result += i
-    return result
+    cursor = session.query(func.sum(Cash.amount)).filter(Cash.time > today)
+    print(cursor.scalar())
+    if cursor.scalar() is None:
+        return 0
+    return cursor.scalar()
 
 
 @statistic.get("/yesterday/")
 async def get_data():
-    answer = session.query(Cash.amount).filter((Cash.time > (today - timedelta(days=1))) & (Cash.time < today)).all()[0]
-    result = 0
-    for i in answer:
-        result += i
-    return result
+    cursor = session.query(func.sum(Cash.amount)).filter((Cash.time > (today - timedelta(days=1))) & (Cash.time < today))
+    print(cursor.scalar())
+    if cursor.scalar() is 0:
+        return 0
+    return cursor.scalar()
 
 
 @statistic.get("/week/")
 async def get_data():
-    answer = session.query(Cash.amount).filter(Cash.time > (today - timedelta(days=7))).all()[0]
-    result = 0
-    for i in answer:
-        result += i
-    return result
+    cursor = session.query(func.sum(Cash.amount)).filter(Cash.time > (today - timedelta(days=7)))
+    print(cursor.scalar())
+    if cursor.scalar() is 0:
+        return 0
+    return cursor.scalar()
 
 
 last_month = datetime(currently.year, (currently.month - 1), 1, 0, 0, 0)
@@ -42,20 +42,14 @@ current_month = datetime(currently.year, currently.month, 1, 0, 0, 0)
 
 @statistic.get("/last_month/")
 async def get_data():
-    answer = session.query(Cash.amount).filter((Cash.time > last_month) & (Cash.time < current_month)).all()[0]
-    result = 0
-    for i in answer:
-        result += i
-    return result
+    cursor = session.query(func.sum(Cash.amount)).filter((Cash.time > last_month) & (Cash.time < current_month))
+    return cursor.scalar()
 
 
 @statistic.get("/current_month/")
 async def get_data():
-    answer = session.query(Cash.amount).filter(Cash.time > current_month).all()[0]
-    result = 0
-    for i in answer:
-        result += i
-    return result
+    cursor = session.query(func.sum(Cash.amount)).filter(Cash.time > current_month)
+    return cursor.scalar()
 
 
 @statistic.get("/after_incas/")
